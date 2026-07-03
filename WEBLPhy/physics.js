@@ -14,20 +14,21 @@ let _isDebug = true, _isStep = false;
 
 export class WEBLPhy {
 
-    constructor(THREEScene = null) {
+    constructor(option = {gravity :[0, -9.8, 0], THREEScene :null, isDebug: true}) {
 
-        this.THREEScene = THREEScene;
+        this.THREEScene = option.THREEScene;
         _scope = this;
-        this.init();
+        _isDebug = option.isDebug;
+        this.init(option.gravity);
     }
 
-    init() {
+    init(gravity = [0, -9.8, 0]) {
     
         PhysX().then((PhysX) => {
     
             if (isServer) {
     
-                    globalThis.PhysX = PhysX;
+                globalThis.PhysX = PhysX;
             } else {
     
                 self.PhysX = PhysX;
@@ -47,7 +48,7 @@ export class WEBLPhy {
 
             _physics = PhysX.CreatePhysics(version, Foundation, Tolerances);
     
-            const Vec3 = new PhysX.PxVec3(0, -9.8, 0);
+            const Vec3 = new PhysX.PxVec3().fromArray(gravity);
             const SceneDesc = new PhysX.PxSceneDesc(Tolerances);
             //SceneDesc.set_gravity(Vec3);
 
