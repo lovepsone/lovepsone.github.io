@@ -66,7 +66,7 @@ export class WEBLPhy {
 
             if (_isDebug && _scope.THREEScene) {
 
-                _Debug = new Debug(_scene, _scope.THREEScene);
+                //_Debug = new Debug(_scene, _scope.THREEScene);
             }
 
             PhysX.destroy(Vec3);
