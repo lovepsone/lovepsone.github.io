@@ -32,16 +32,16 @@
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.y = 80;
 			scene.add( mesh );
-			phy.addMesh(mesh, {mass: 10, isDynamic: true});
+			phy.addMesh( mesh, { mass: 10, isDynamic: true } );
 			
-			const pg = new THREE.PlaneGeometry(1024, 1024, 1023, 1023);
-			pg.rotateX(- Math.PI / 2);
+			const pg = new THREE.PlaneGeometry( 1024, 1024, 1023, 1023 );
+			pg.rotateX( - Math.PI / 2 );
 			pg.computeBoundingBox();
 			pg.center();
 
-			const plane = new THREE.Mesh(pg, new THREE.MeshBasicMaterial( { color: 0xaaaaaa } ) );
-			_scene.add(plane);
-
+			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0xaaaaaa } ) );
+			scene.add( plane );
+			phy.addMesh( plane );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -70,7 +70,7 @@
 
 			renderer.render( scene, camera );
 
-			if (phy) phy.stepSimulation(0.1, 1/60);
+			if ( phy ) phy.stepSimulation( 0.1, 1/60 );
 		}	
 	</script>
   </body>
