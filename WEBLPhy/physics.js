@@ -82,7 +82,7 @@ export class WEBLPhy {
         option.static_friction = option.static_friction || 0.1;
         option.dynamic_friction = option.dynamic_friction || 0.5;
         option.restitution = option.restitution || 0.1;
-        _RigidBody.add(mesh, option);
+        //_RigidBody.add(mesh, option);
     }
 
     addCharacter(radius = 4, height = 8, position = [0, 70, 0]) {
