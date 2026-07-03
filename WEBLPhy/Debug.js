@@ -3,7 +3,7 @@
 * @ver - 0.0.1 
 */
 
-import * as THREE from './../libs/three.module.js';
+import * as THREE from './../examples/libs/three.module.js';
 
 const maxBufferSize = 1000000;
 let _mesh;
