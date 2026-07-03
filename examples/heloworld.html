@@ -9,15 +9,15 @@
     <script type="module">
 
 		import * as THREE from './libs/three.module.js';
-		import {WEBLPhy} from './../WEBLPhy/physics.js';
+		//import {WEBLPhy} from './../WEBLPhy/physics.js';
 
 		let camera, scene, renderer;
 
 		function init() {
 
 			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.position.z = 100;
-			camera.position.y = 100;
+			camera.position.z = 10;
+			//camera.position.y = 100;
 			camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
 
 			scene = new THREE.Scene();
