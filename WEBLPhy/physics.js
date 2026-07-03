@@ -14,10 +14,12 @@ let _isDebug = true, _isStep = false;
 
 export class WEBLPhy {
 
-    constructor(option = {gravity :[0, -9.8, 0], THREEScene :null, isDebug: true}) {
+    constructor(option = {gravity: [0, -9.8, 0], THREEScene: null, isDebug: true}) {
 
         this.THREEScene = option.THREEScene;
         _scope = this;
+        option.isDebug = option.isDebug || true;
+        option.gravity = option.gravity || [0, -9.8, 0];
         _isDebug = option.isDebug;
         this.init(option.gravity);
     }
@@ -73,6 +75,13 @@ export class WEBLPhy {
 
     addMesh(mesh, option = {mass: 0, isDynamic: false, isKinematic: false, type_geometry: '', static_friction: 0.1, dynamic_friction: 0.5, restitution: 0.1}) {
 
+        option.mass = option.mass || 0;
+        option.isDynamic = option.isDynamic || false;
+        option.isKinematic = option.isKinematic || false;
+        option.type_geometry = option.type_geometry || '';
+        option.static_friction = option.static_friction || 0.1;
+        option.dynamic_friction = option.dynamic_friction || 0.5;
+        option.restitution = option.restitution || 0.1;
         _RigidBody.add(mesh, option);
     }
 
