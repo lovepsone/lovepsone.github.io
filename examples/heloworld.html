@@ -14,7 +14,7 @@
 		let camera, scene, renderer, mesh;
 		let phy;
 		const lookAt = new THREE.Vector3( 0, 0, 0 );
-		init();
+		
 
 		function init() {
 
@@ -32,7 +32,7 @@
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.y = 80;
 			scene.add( mesh );
-			phy.addMesh( mesh, { mass: 10, isDynamic: true } );
+			//phy.addMesh( mesh, { mass: 10, isDynamic: true } );
 			
 			const pg = new THREE.PlaneGeometry( 1024, 1024, 1023, 1023 );
 			pg.rotateX( - Math.PI / 2 );
@@ -54,6 +54,8 @@
 
 		}
 
+		init();
+
 		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
@@ -71,7 +73,7 @@
 			renderer.render( scene, camera );
 
 			if ( phy ) phy.stepSimulation( 0.1, 1/60 );
-		}	
+		}
 	</script>
   </body>
 </html>
