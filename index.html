@@ -111,7 +111,46 @@
       }
     </style>
     <script type="module">
+     const examples = [
 
+      ];
+
+      function exampleTemplate(name) {
+        const readableName = replaceAll(name, '_', ' ').replace('threejs', 'three.js').replace('sharedarraybuffer', 'SharedArrayBuffer');
+
+        return `
+          <div class="example">
+            <a href="examples/${name}" class="image"><img src="screenshots/${name}.png" /></a>
+            <div class="caption">
+              <a href="examples/${name}" class="name">${readableName}</a>
+              <a
+                href="https://github.com/lovepsone/lovepsone.github.io/tree/main/example${name}.html"
+                target="_blank"
+                class="github"
+                title="View source code on GitHub"
+                ><img src="examples/icons/github.svg" alt="GitHub"
+              /></a>
+            </div>
+          </div>
+        `;
+      }
+
+      // generate and add the examples to the DOM
+      const examplesContainer = document.querySelector('.examples')
+      examples.forEach((example) => {
+        const exampleNode = createElementFromHTML(exampleTemplate(example))
+        examplesContainer.appendChild(exampleNode)
+      })
+
+      function createElementFromHTML(htmlString) {
+        const div = document.createElement('div')
+        div.innerHTML = htmlString.trim()
+        return div.firstChild
+      }
+
+      function replaceAll(string, find, replace) {
+        return string.split(find).join(replace)
+      }
     </script>
   </head>
 
