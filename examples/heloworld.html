@@ -9,7 +9,8 @@
     <script type="module">
 
 		import * as THREE from './libs/three.module.js';
-		import {WEBLPhy} from './../WEBLPhy/physics.js';
+		import { OrbitControls } from './libs/OrbitControls.js';
+		import { WEBLPhy } from './../WEBLPhy/physics.js';
 
 		let camera, scene, renderer, mesh;
 		let phy;
@@ -19,37 +20,48 @@
 		function init() {
 
 			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.position.z = 55;
-			camera.position.y = 30;
-			camera.lookAt(lookAt);
+			camera.position.set( - 1, 1.5, 2 );
+			camera.lookAt( 0, 0.5, 0 );
 
 			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x666666 );
+			const color = new THREE.Color();
 
 			phy = new WEBLPhy({THREEScene: scene});
+/*
 			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 			const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.y = 80;
 			scene.add( mesh );
 			phy.addMesh( mesh, { mass: 10, isDynamic: true } );
-			
+*/
+			for ( let i = 0; i < 10; i ++ ) {
+
+				const geometry = new THREE.BoxGeometry( 0.075, 0.075, 0.075 );
+				const material = new THREE.MeshBasicMaterial( { color: color.setHex( 0xffffff * Math.random() ) } );
+				const box = new THREE.Mesh( geometry, material );
+				box.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
+				scene.add( box );
+				phy.addMesh( box, { mass: 100, isDynamic: true } );
+			}
+
 			const pg = new THREE.PlaneGeometry(300, 300, 299, 299 );
 			pg.rotateX( - Math.PI / 2 );
-			pg.computeBoundingBox();
-			pg.center();
-
 			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0x00aa00 } ) );
 			scene.add( plane );
 			phy.addMesh( plane );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor(0x808080);
+			//renderer.setClearColor(0x808080);
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
 			document.body.appendChild( renderer.domElement );
 
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.y = 0.5;
+			controls.update();
 
 			window.addEventListener( 'resize', onWindowResize );
 
@@ -68,7 +80,6 @@
 
 		function animate() {
 
-			camera.lookAt(lookAt);
 			if ( phy ) phy.stepSimulation( 0.1, 1/60 );
 
 			renderer.render( scene, camera );
