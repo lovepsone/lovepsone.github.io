@@ -28,8 +28,8 @@
 
 			for ( let i = 0; i < 100; i ++ ) {
 
-				const geometry = new THREE.BoxGeometry( 2, 2, 2 );
-				const geometry2 = new THREE.SphereGeometry(1, 10, 10); 
+				const geometry = new THREE.BoxGeometry( 6, 6, 6 );
+				const geometry2 = new THREE.SphereGeometry(3, 20, 20); 
 				const material = new THREE.MeshBasicMaterial( { color: color.setHex( 0xffffff * Math.random() ) } );
 				const box = new THREE.Mesh( geometry, material );
 				box.position.set( Math.random() - 25, Math.random() * 300, Math.random() - 25 );
@@ -42,8 +42,7 @@
 				phy.addMesh( sphere, { mass: 30, isDynamic: true } );
 			}
 
-			const pg = new THREE.PlaneGeometry(300, 300, 299, 299 );
-			pg.rotateX( - Math.PI / 2 );
+			const pg = new THREE.BoxGeometry(300, 0.1, 300);
 			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0x00aa00 } ) );
 			scene.add( plane );
 			phy.addMesh( plane );
