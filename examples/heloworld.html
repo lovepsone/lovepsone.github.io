@@ -41,7 +41,7 @@
 				const geometry = new THREE.BoxGeometry( 0.075, 0.075, 0.075 );
 				const material = new THREE.MeshBasicMaterial( { color: color.setHex( 0xffffff * Math.random() ) } );
 				const box = new THREE.Mesh( geometry, material );
-				box.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
+				box.position.set( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
 				scene.add( box );
 				phy.addMesh( box, { mass: 100, isDynamic: true } );
 			}
