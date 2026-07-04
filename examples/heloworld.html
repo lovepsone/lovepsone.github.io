@@ -44,7 +44,7 @@
 			phy.addMesh( plane );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			_renderer.setClearColor(0x808080);
+			renderer.setClearColor(0x808080);
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
