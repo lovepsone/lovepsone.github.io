@@ -3,7 +3,7 @@
 * @ver - 0.0.1 
 */
 
-let _bodys = [];
+let _bodys = [], _static = [];
 
 export class RigidBody {
 
@@ -22,12 +22,12 @@ export class RigidBody {
 
             const position = _bodys[i].body.getGlobalPose().get_p();
             const quat = _bodys[i].body.getGlobalPose().get_q();
-             _bodys[i].mesh.position.fromArray(position.toArray());
-            //_bodys[i].mesh.position.set(position.get_x(), position.get_y(), position.get_z());// упростить
-            _bodys[i].mesh.quaternion.set(quat.get_x(), quat.get_y(), quat.get_z(), quat.get_w());// упростить
+            _bodys[i].mesh.position.fromArray(position.toArray());
+            _bodys[i].mesh.quaternion.fromArray(quat.toArray());
+            //_bodys[i].mesh.quaternion.set(quat.get_x(), quat.get_y(), quat.get_z(), quat.get_w());// упростить
         }
     }
-//option = {mass: 0.1, isDynamic: true, isKinematic: false, typeGeometry: ''}
+
     add(mesh, option = {mass: 0, isDynamic: false, isKinematic: false, type_geometry: '', static_friction: 0.1, dynamic_friction: 0.5, restitution: 0.1}) {
 
         let type = 'BoxGeometry', shape, geometry, rigid;
@@ -186,6 +186,9 @@ export class RigidBody {
                     indexVector.pushBack(index[i]);
                 }
 
+                //const nDataBytes = points.length * points.BYTES_PER_ELEMENT;
+                //const ptr = PhysX._malloc(nDataBytes);
+
                 const TriangleDesc = new PhysX.PxTriangleMeshDesc();
                 TriangleDesc.points.count = pointsVector.size();
                 TriangleDesc.points.stride = 12;
@@ -239,13 +242,14 @@ export class RigidBody {
 
             rigid.setMass(option.mass);
             PhysX.PxRigidBodyExt.prototype.updateMassAndInertia(rigid, option.mass);
-            _bodys.push({body:rigid, mesh: mesh});
+            _bodys.push({body:rigid, mesh: mesh, isKinematic: isKinematic});
             this.scene.addActor(rigid);
             //shape.release();
 
         } else if (shape) {
 
             this.scene.addActor(rigid);
+            _static.push({body:rigid, mesh: mesh});
             //shape.release();
         } else {
 
@@ -257,7 +261,23 @@ export class RigidBody {
         PhysX.destroy(flags);
         PhysX.destroy(Transform);
         PhysX.destroy(Vec3);
-        //PhysX.destroy(geometry);
+
+        if (option.isDynamic) {
+
+            mesh.PhysX = {
+                id: _bodys.length - 1,
+                isDynamic: true,
+                isKinematic: option.isKinematic
+            }
+            return _bodys.length - 1;
+        } else {
+
+            mesh.PhysX = {
+                id: _bodys.length - 1,
+                isDynamic: false
+            }
+            return _static.length - 1;
+        }
     }
 
     disableShapeInContact(id) {
