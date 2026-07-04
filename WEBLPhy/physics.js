@@ -32,7 +32,8 @@ export class WEBLPhy {
         mathExtend();
         const version = PhysX.PHYSICS_VERSION;
         console.log(`PhysX loaded! Version: ${((version >> 24) & 0xff)}.${((version >> 16) & 0xff)}.${((version >> 8) & 0xff)}`);
-    
+
+        const SimulationCallback = new PhysX.PxSimulationEventCallbackImpl();
         const DefaultAllocator = new PhysX.PxDefaultAllocator();
         const DefaultErrorCallback = new PhysX.PxDefaultErrorCallback();
         const Foundation = PhysX.CreateFoundation(version, DefaultAllocator, DefaultErrorCallback);
@@ -50,6 +51,7 @@ export class WEBLPhy {
         SceneDesc.set_cpuDispatcher(PhysX.DefaultCpuDispatcherCreate(0));
         SceneDesc.set_filterShader(PhysX.DefaultFilterShader());
         SceneDesc.flags.raise(PhysX.PxSceneFlagEnum.eENABLE_ACTIVE_ACTORS);
+        SceneDesc.simulationEventCallback = SimulationCallback;
         _scene = _physics.createScene(SceneDesc);
         _scene.setBounceThresholdVelocity(0.001); //?
         _scene.setGravity(Vec3);
@@ -63,6 +65,26 @@ export class WEBLPhy {
         }
 
         PhysX.destroy(Vec3);
+
+        SimulationCallback.onConstraintBreak = (constraints, count) => {
+
+        };
+
+        SimulationCallback.onWake = (actors, count) => {
+
+        };
+
+        SimulationCallback.onSleep = (actors, count) => {
+
+        };
+
+        SimulationCallback.onContact = (pairHeader, pairs, nbPairs) => {
+
+        }
+
+        SimulationCallback.onTrigger = (pairs, count) => {
+
+        }
     }
 
     addMesh(mesh,
