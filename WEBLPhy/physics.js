@@ -2,7 +2,8 @@
 * @author lovepsone 2026
 * @ver - 0.0.1 
 */
-import PhysX from './lib/physx-js-webidl.mjs';
+
+import {loadPhysX} from './Loader.js';
 import {RigidBody} from './RigidBody.js';
 import {Debug} from './Debug.js';
 import {CharacterControl} from './CharacterControl.js';
@@ -11,6 +12,8 @@ import {mathExtend} from './Match.js';
 const isServer = false;
 let _scope, _physics, _scene, _RigidBody, _CharacterControl, _Debug;
 let _isDebug = true, _isStep = false;
+
+globalThis.PhysX = loadPhysX;
 
 export class WEBLPhy {
 
@@ -25,52 +28,41 @@ export class WEBLPhy {
     }
 
     init(gravity = [0, -9.8, 0]) {
-    
-        PhysX().then((PhysX) => {
-    
-            if (isServer) {
-    
-                globalThis.PhysX = PhysX;
-            } else {
-    
-                self.PhysX = PhysX;
-            }
 
-            mathExtend();
-            const version = PhysX.PHYSICS_VERSION;
-            console.log(`PhysX loaded! Version: ${((version >> 24) & 0xff)}.${((version >> 16) & 0xff)}.${((version >> 8) & 0xff)}`);
+        mathExtend();
+        const version = PhysX.PHYSICS_VERSION;
+        console.log(`PhysX loaded! Version: ${((version >> 24) & 0xff)}.${((version >> 16) & 0xff)}.${((version >> 8) & 0xff)}`);
     
-            const DefaultAllocator = new PhysX.PxDefaultAllocator();
-            const DefaultErrorCallback = new PhysX.PxDefaultErrorCallback();
-            const Foundation = PhysX.CreateFoundation(version, DefaultAllocator, DefaultErrorCallback);
+        const DefaultAllocator = new PhysX.PxDefaultAllocator();
+        const DefaultErrorCallback = new PhysX.PxDefaultErrorCallback();
+        const Foundation = PhysX.CreateFoundation(version, DefaultAllocator, DefaultErrorCallback);
     
-            const Tolerances = new PhysX.PxTolerancesScale();
-            const cookingParams = new PhysX.PxCookingParams(Tolerances);
-            cookingParams.suppressTriangleMeshRemapTable = true;
+        const Tolerances = new PhysX.PxTolerancesScale();
+        const cookingParams = new PhysX.PxCookingParams(Tolerances);
+        cookingParams.suppressTriangleMeshRemapTable = true;
 
-            _physics = PhysX.CreatePhysics(version, Foundation, Tolerances);
+        _physics = PhysX.CreatePhysics(version, Foundation, Tolerances);
     
-            const Vec3 = new PhysX.PxVec3().fromArray(gravity);
-            const SceneDesc = new PhysX.PxSceneDesc(Tolerances);
-            //SceneDesc.set_gravity(Vec3);
+        const Vec3 = new PhysX.PxVec3().fromArray(gravity);
+        const SceneDesc = new PhysX.PxSceneDesc(Tolerances);
+        //SceneDesc.set_gravity(Vec3);
 
-            SceneDesc.set_cpuDispatcher(PhysX.DefaultCpuDispatcherCreate(0));
-            SceneDesc.set_filterShader(PhysX.DefaultFilterShader());
-            SceneDesc.flags.raise(PhysX.PxSceneFlagEnum.eENABLE_ACTIVE_ACTORS);
-            _scene = _physics.createScene(SceneDesc);
-            _scene.setBounceThresholdVelocity(0.001); //?
-            _scene.setGravity(Vec3);
+        SceneDesc.set_cpuDispatcher(PhysX.DefaultCpuDispatcherCreate(0));
+        SceneDesc.set_filterShader(PhysX.DefaultFilterShader());
+        SceneDesc.flags.raise(PhysX.PxSceneFlagEnum.eENABLE_ACTIVE_ACTORS);
+        _scene = _physics.createScene(SceneDesc);
+        _scene.setBounceThresholdVelocity(0.001); //?
+        _scene.setGravity(Vec3);
     
-            _RigidBody = new RigidBody(_physics, _scene, cookingParams);
-            _CharacterControl = new CharacterControl(_physics, _scene);
+        _RigidBody = new RigidBody(_physics, _scene, cookingParams);
+        _CharacterControl = new CharacterControl(_physics, _scene);
 
-            if (_isDebug && _scope.THREEScene) {
+        if (_isDebug && _scope.THREEScene) {
 
-                //_Debug = new Debug(_scene, _scope.THREEScene);
-            }
+            _Debug = new Debug(_scene, _scope.THREEScene);
+        }
 
-            PhysX.destroy(Vec3);
-        });
+        PhysX.destroy(Vec3);
     }
 
     addMesh(mesh, option = {mass: 0, isDynamic: false, isKinematic: false, type_geometry: '', static_friction: 0.1, dynamic_friction: 0.5, restitution: 0.1}) {
@@ -82,7 +74,7 @@ export class WEBLPhy {
         option.static_friction = option.static_friction || 0.1;
         option.dynamic_friction = option.dynamic_friction || 0.5;
         option.restitution = option.restitution || 0.1;
-        //_RigidBody.add(mesh, option);
+        _RigidBody.add(mesh, option);
     }
 
     addCharacter(radius = 4, height = 8, position = [0, 70, 0]) {
@@ -104,7 +96,6 @@ export class WEBLPhy {
 
             _isStep = true;
             _RigidBody.step();
-            //_CharacterControl.step(Delta, TimeStep);
 
             if (_isDebug && _scope.THREEScene && _Debug) _Debug.Draw();
         }

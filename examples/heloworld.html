@@ -32,7 +32,7 @@
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.y = 80;
 			scene.add( mesh );
-			//phy.addMesh( mesh, { mass: 10, isDynamic: true } );
+			phy.addMesh( mesh, { mass: 10, isDynamic: true } );
 			
 			const pg = new THREE.PlaneGeometry( 1024, 1024, 1023, 1023 );
 			pg.rotateX( - Math.PI / 2 );
