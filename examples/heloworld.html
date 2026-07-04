@@ -20,7 +20,7 @@
 
 			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
 			camera.position.z = 55;
-			camera.position.y = 70;
+			camera.position.y = 30;
 			camera.lookAt(lookAt);
 
 			scene = new THREE.Scene();
@@ -34,12 +34,12 @@
 			scene.add( mesh );
 			phy.addMesh( mesh, { mass: 10, isDynamic: true } );
 			
-			const pg = new THREE.PlaneGeometry( 1024, 1024, 1023, 1023 );
+			const pg = new THREE.PlaneGeometry(300, 300, 299, 299 );
 			pg.rotateX( - Math.PI / 2 );
 			pg.computeBoundingBox();
 			pg.center();
 
-			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0xa00aaa } ) );
+			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0x00aa00 } ) );
 			scene.add( plane );
 			phy.addMesh( plane );
 
