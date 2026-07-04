@@ -19,14 +19,14 @@
 		function init() {
 
 			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.position.z = 100;
+			camera.position.z = 40;
 			camera.position.y = 100;
 			camera.lookAt(lookAt);
 
 			scene = new THREE.Scene();
 
 			phy = new WEBLPhy({THREEScene: scene});
-			const geometry = new THREE.BoxGeometry();
+			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 			const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
 			mesh = new THREE.Mesh( geometry, material );
