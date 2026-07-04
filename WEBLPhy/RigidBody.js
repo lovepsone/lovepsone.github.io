@@ -2,7 +2,6 @@
 * @author lovepsone 2026
 * @ver - 0.0.1 
 */
-import {putIntoPhysXHeap} from './Match.js';
 
 let _bodys = [];
 
