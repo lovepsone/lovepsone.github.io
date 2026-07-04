@@ -39,11 +39,12 @@
 			pg.computeBoundingBox();
 			pg.center();
 
-			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0xaaaaaa } ) );
+			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0xa00aaa } ) );
 			scene.add( plane );
 			phy.addMesh( plane );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			_renderer.setClearColor(0x808080);
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setAnimationLoop( animate );
@@ -67,12 +68,11 @@
 
 		function animate() {
 
-			//mesh.rotation.x += 0.005;
-			//mesh.rotation.y += 0.01;
+			camera.lookAt(lookAt);
+			if ( phy ) phy.stepSimulation( 0.1, 1/60 );
 
 			renderer.render( scene, camera );
 
-			if ( phy ) phy.stepSimulation( 0.1, 1/60 );
 		}
 	</script>
   </body>
