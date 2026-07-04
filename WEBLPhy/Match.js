@@ -7,35 +7,18 @@ export function ControllerShapeHitToPoint(hit) {
     return PhysX.wrapPointer(hit, PhysX.PxControllerShapeHit);
 }
 
-export const putIntoPhysXHeap = (heap, array) => {
-
-    const ptr = PhysX._malloc(4 * array.length);
-    let offset = 0;
-
-    for (let i = 0; i < array.length; i++) {
-
-        heap[(ptr + offset) >> 2] = array[i];
-        offset += 4;
-    }
-
-    return ptr;
-};
-
-export const getFromPhysXHeap = (heap, address, count) => {
-
-    const result = [];
-    let offset = 0;
-
-    for (let i = 0; i < count; i++) {
-
-        result.push(heap[(address + offset) >> 2]);
-        offset += 4;
-    }
-
-    return result;
-};
-
 export function mathExtend() {
+
+    PhysX._HEAP8 = new Int8Array();
+    PhysX._HEAP16 = new Int16Array();
+    PhysX._HEAP32 = new Int32Array();
+
+    PhysX._HEAPU8 = new Uint8Array();
+    PhysX._HEAPU16 = new Uint16Array();
+    PhysX._HEAPU32 = new Uint32Array();
+
+    PhysX._HEAPF32 = new Float32Array();
+    PhysX._HEAPF64 = new Float64Array();
 
     /*
     Vec3
