@@ -28,7 +28,20 @@ export class RigidBody {
         }
     }
 
-    add(mesh, option = {mass: 0, isDynamic: false, isKinematic: false, type_geometry: '', static_friction: 0.1, dynamic_friction: 0.5, restitution: 0.1}) {
+    add(mesh, 
+        option = {
+            mass: 0,
+            isDynamic:
+            false,
+            isKinematic: false,
+            type_geometry: '',
+            static_friction: 0.1,
+            dynamic_friction: 0.5,
+            restitution: 0.1,
+            FLAG_SHAPE_eSIMULATION: true,
+            FLAG_SHAPE_eSCENE_QUERY: true,
+            FLAG_SHAPE_eVISUALIZATION: true
+        }) {
 
         let type = 'BoxGeometry', shape, geometry, rigid;
 
@@ -234,6 +247,10 @@ export class RigidBody {
 
         if (shape) {
 
+            shape.setFlag(PhysX.PxShapeFlagEnum.eSCENE_QUERY_SHAPE, option.FLAG_SHAPE_eSCENE_QUERY);
+            shape.setFlag(PhysX.PxShapeFlagEnum.eSIMULATION_SHAPE, option.FLAG_SHAPE_eSIMULATION);
+            shape.setFlag(PhysX.PxShapeFlagEnum.eVISUALIZATION, option.FLAG_SHAPE_eVISUALIZATION);
+
             shape.setSimulationFilterData(this.FilterData);
             shape.setQueryFilterData(this.FilterData);
         }
@@ -242,14 +259,16 @@ export class RigidBody {
 
             rigid.setMass(option.mass);
             PhysX.PxRigidBodyExt.prototype.updateMassAndInertia(rigid, option.mass);
-            _bodys.push({body:rigid, mesh: mesh, isKinematic: isKinematic});
+            //Vec3.fromArray([0, 10, 0]);
+            //rigid.setMassSpaceInertiaTensor(Vec3);
+            _bodys.push({body:rigid, mesh: mesh, isKinematic: option.isKinematic});
             this.scene.addActor(rigid);
             //shape.release();
 
         } else if (shape) {
 
             this.scene.addActor(rigid);
-            _static.push({body:rigid, mesh: mesh});
+            _static.push({body: rigid, mesh: mesh});
             //shape.release();
         } else {
 
@@ -278,26 +297,5 @@ export class RigidBody {
             }
             return _static.length - 1;
         }
-    }
-
-    disableShapeInContact(id) {
-
-        //_bodys[id].body
-        //shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-    }
-
-    enableShapeInContact(id) {
-
-        //shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-    }
-
-    disableShapeInSceneQuery(id) {
-
-        //shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
-    }
-
-    enableShapeInSceneQuery(id) {
-
-        //shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
     }
 }

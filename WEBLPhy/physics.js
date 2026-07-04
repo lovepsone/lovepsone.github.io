@@ -65,7 +65,20 @@ export class WEBLPhy {
         PhysX.destroy(Vec3);
     }
 
-    addMesh(mesh, option = {mass: 0, isDynamic: false, isKinematic: false, type_geometry: '', static_friction: 0.1, dynamic_friction: 0.5, restitution: 0.1}) {
+    addMesh(mesh,
+        option = {
+            mass: 0,
+            isDynamic: false,
+            isKinematic: false,
+            type_geometry: '',
+            static_friction: 0.1,
+            dynamic_friction: 0.5,
+            restitution: 0.1,
+            FLAG_SHAPE_eSIMULATION: true,
+            FLAG_SHAPE_eSCENE_QUERY: true,
+            FLAG_SHAPE_eVISUALIZATION: true
+        }
+    ) {
 
         option.mass = option.mass || 0;
         option.isDynamic = option.isDynamic || false;
@@ -74,6 +87,10 @@ export class WEBLPhy {
         option.static_friction = option.static_friction || 0.1;
         option.dynamic_friction = option.dynamic_friction || 0.5;
         option.restitution = option.restitution || 0.1;
+        option.FLAG_SHAPE_eSIMULATION = option.FLAG_SHAPE_eSIMULATION || true;
+        option.FLAG_SHAPE_eSCENE_QUERY =  option.FLAG_SHAPE_eSCENE_QUERY || true;
+        option.FLAG_SHAPE_eVISUALIZATION = option.FLAG_SHAPE_eVISUALIZATION || true;
+        
         return _RigidBody.add(mesh, option); // return id Body
     }
 
