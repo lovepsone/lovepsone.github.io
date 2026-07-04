@@ -12,38 +12,34 @@
 		import { OrbitControls } from './libs/OrbitControls.js';
 		import { WEBLPhy } from './../WEBLPhy/physics.js';
 
-		let camera, scene, renderer, mesh;
-		let phy;
-		const lookAt = new THREE.Vector3( 0, 0, 0 );
+		let camera, scene, renderer, mesh, phy;
 		
-
 		function init() {
 
-			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.position.set( - 1, 1.5, 2 );
-			camera.lookAt( 0, 0.5, 0 );
+			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera.position.set( - 50, 45, 80 );
+			camera.lookAt( 0, 5, 0 );
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x666666 );
 			const color = new THREE.Color();
 
-			phy = new WEBLPhy({THREEScene: scene});
-/*
-			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
-			const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-			mesh = new THREE.Mesh( geometry, material );
-			mesh.position.y = 80;
-			scene.add( mesh );
-			phy.addMesh( mesh, { mass: 10, isDynamic: true } );
-*/
-			for ( let i = 0; i < 10; i ++ ) {
+			phy = new WEBLPhy();
 
-				const geometry = new THREE.BoxGeometry( 0.075, 0.075, 0.075 );
+			for ( let i = 0; i < 100; i ++ ) {
+
+				const geometry = new THREE.BoxGeometry( 2, 2, 2 );
+				const geometry2 = new THREE.SphereGeometry(1, 10, 10); 
 				const material = new THREE.MeshBasicMaterial( { color: color.setHex( 0xffffff * Math.random() ) } );
 				const box = new THREE.Mesh( geometry, material );
-				box.position.set( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
+				box.position.set( Math.random() - 25, Math.random() * 300, Math.random() - 25 );
 				scene.add( box );
 				phy.addMesh( box, { mass: 100, isDynamic: true } );
+
+				const sphere = new THREE.Mesh( geometry2, material );
+				sphere.position.set( Math.random() - 15, Math.random() * 700, Math.random() - 15 );
+				scene.add( sphere );
+				phy.addMesh( sphere, { mass: 30, isDynamic: true } );
 			}
 
 			const pg = new THREE.PlaneGeometry(300, 300, 299, 299 );
