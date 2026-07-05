@@ -84,6 +84,12 @@ export class WEBLPhy {
 
         SimulationCallback.onTrigger = (pairs, count) => {
 
+            const pointer = PhysX.wrapPointer(pairs, PhysX.PxTriggerPair);
+
+            for (let i = 0; i < count; i++) {
+
+                const pair = PhysX.NativeArrayHelpers.getTriggerPairAt(pointer, i);
+            }
         }
     }
 
