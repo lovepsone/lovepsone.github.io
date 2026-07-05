@@ -53,7 +53,7 @@ export class RigidBody {
 
         if (option.type_geometry === 'TriangleGeometry' /*|| option.type_geometry === 'ConvexGeometry'*/) {
 
-             type = option.type_geometry;
+            type = option.type_geometry;
         }
 
         const collisionLayer = 1;
@@ -266,7 +266,6 @@ export class RigidBody {
             };
             _BodysDynamic.set(rigid.ptr, {body:rigid, mesh: mesh, isKinematic: option.isKinematic});
             this.scene.addActor(rigid);
-            //shape.release();
 
         } else if (shape) {
 
@@ -276,7 +275,6 @@ export class RigidBody {
             };
             _BodysStatic.set(rigid.ptr, {body:rigid, mesh: mesh});
             this.scene.addActor(rigid);
-            //shape.release();
         } else {
 
             console.warn('WEBLPhy: This type of geometry is not supported!:', type);
@@ -289,5 +287,28 @@ export class RigidBody {
         PhysX.destroy(Vec3);
 
         if (mesh.PhysX.id) return mesh.PhysX.id;
+    }
+
+    remove(mesh) {
+
+        if (mesh.PhysX && mesh.isMesh) {
+
+            if (mesh.PhysX.isDynamic) {
+
+                this.scene.removeActor(_BodysDynamic.get(mesh.PhysX.id).body);
+                _BodysDynamic.delete(mesh.PhysX.id); 
+
+            } else if (!mesh.PhysX.isDynamic) {
+
+                this.scene.removeActor(_BodysStatic.get(mesh.PhysX.id).body);
+                _BodysStatic.delete(mesh.PhysX.id);
+            } else {
+
+                console.warn('WEBLPhy: This mesh does not exist', mesh);
+            }
+        } else {
+
+            console.log('');
+        }
     }
 }
