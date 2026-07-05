@@ -3,7 +3,7 @@
 * @ver - 0.0.1 
 */
 
-let _bodys = [], _static = [];
+let _BodysDynamic = new Map(), _BodysStatic = new Map(); 
 
 export class RigidBody {
 
@@ -16,16 +16,13 @@ export class RigidBody {
 
     step() {
 
-        if(_bodys.length === 0) return;
+        _BodysDynamic.forEach((value, key, map) => {
 
-        for (let i = 0; i < _bodys.length; i ++) {
-
-            const position = _bodys[i].body.getGlobalPose().get_p();
-            const quat = _bodys[i].body.getGlobalPose().get_q();
-            _bodys[i].mesh.position.fromArray(position.toArray());
-            _bodys[i].mesh.quaternion.fromArray(quat.toArray());
-            //_bodys[i].mesh.quaternion.set(quat.get_x(), quat.get_y(), quat.get_z(), quat.get_w());// упростить
-        }
+            const position = value.body.getGlobalPose().get_p();
+            const quat = value.body.getGlobalPose().get_q();
+            value.mesh.position.fromArray(position.toArray());
+            value.mesh.quaternion.fromArray(quat.toArray());
+        });
     }
 
     add(mesh, 
@@ -261,14 +258,24 @@ export class RigidBody {
             PhysX.PxRigidBodyExt.prototype.updateMassAndInertia(rigid, option.mass);
             //Vec3.fromArray([0, 10, 0]);
             //rigid.setMassSpaceInertiaTensor(Vec3);
-            _bodys.push({body:rigid, mesh: mesh, isKinematic: option.isKinematic});
+    
+            mesh.PhysX = {
+                id: rigid.ptr,
+                isDynamic: true,
+                isKinematic: option.isKinematic
+            };
+            _BodysDynamic.set(rigid.ptr, {body:rigid, mesh: mesh, isKinematic: option.isKinematic});
             this.scene.addActor(rigid);
             //shape.release();
 
         } else if (shape) {
 
+            mesh.PhysX = {
+                id: rigid.ptr,
+                isDynamic: false,
+            };
+            _BodysStatic.set(rigid.ptr, {body:rigid, mesh: mesh});
             this.scene.addActor(rigid);
-            _static.push({body: rigid, mesh: mesh});
             //shape.release();
         } else {
 
@@ -281,21 +288,6 @@ export class RigidBody {
         PhysX.destroy(Transform);
         PhysX.destroy(Vec3);
 
-        if (option.isDynamic) {
-
-            mesh.PhysX = {
-                id: _bodys.length - 1,
-                isDynamic: true,
-                isKinematic: option.isKinematic
-            }
-            return _bodys.length - 1;
-        } else {
-
-            mesh.PhysX = {
-                id: _bodys.length - 1,
-                isDynamic: false
-            }
-            return _static.length - 1;
-        }
+        if (mesh.PhysX.id) return mesh.PhysX.id;
     }
 }
