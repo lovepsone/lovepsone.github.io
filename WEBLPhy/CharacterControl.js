@@ -3,8 +3,6 @@
 * @ver - 0.0.1 
 */
 
-import {ControllerShapeHitToPoint} from './Match.js';
-
 let _manager, _ObstacleContext, _characters = [], _ControllerFilters;
 
 const FREEFALL = - 9.8, SPEEDJUMP = 3.2;
@@ -21,7 +19,7 @@ export class CharacterControl {
 
         _manager = PhysX.PxTopLevelFunctions.prototype.CreateControllerManager(this.scene);
         _ObstacleContext = _manager.createObstacleContext();
-        //_manager.setOverlapRecoveryModule(true); // модуль восстановления наложений
+        _manager.setOverlapRecoveryModule(true); // модуль восстановления наложений
 
         _ControllerFilters = new PhysX.PxControllerFilters();
     }
@@ -34,8 +32,8 @@ export class CharacterControl {
         ccd.height = height;
         ccd.radius = radius;
         ccd.stepOffset = 0.1 // Смещение шага
-        ccd.contactOffset = 0.001; // доп.слой вокруг капсулы
-        ccd.maxJumpHeight = 0.001; // размер ограничивающего объема вниз
+        ccd.contactOffset = 1.001; // доп.слой вокруг капсулы
+        ccd.maxJumpHeight = 1.001; // размер ограничивающего объема вниз
         ccd.invisibleWallHeight = 0; // ?
         ccd.slopeLimit = Math.cos((45 * Math.PI) / 180); // предел наклона, при котором движение продалжается
         ccd.climbingModeEnum = PhysX.PxCapsuleClimbingModeEnum.eEASY;
@@ -61,10 +59,17 @@ export class CharacterControl {
 
         r_callback.onShapeHit = (hit) => {
 
-            //const point = ControllerShapeHitToPoint(hit);
-            //const worldNormal = point.worldNormal.toArray();
-            //const worldPos = point.worldPos.toArray();
-            //передать данные через eventCustom ?
+            const point = PhysX.wrapPointer(hit, PhysX.PxControllerShapeHit);
+            const worldNormal = point.worldNormal.toArray();
+            const worldPos = point.worldPos.toArray();
+
+            const event = new CustomEvent('CharacterOnShapeHit', {
+                detail: {
+                    point: point,
+                    worldNormal: worldNormal,
+                    worldPos: worldPos
+                }
+            });
         };
 
         r_callback.onControllerHit = (hit) => {

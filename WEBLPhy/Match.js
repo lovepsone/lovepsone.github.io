@@ -2,10 +2,6 @@
 * @author lovepsone 2026
 * @ver - 0.0.1 
 */
-export function ControllerShapeHitToPoint(hit) {
-
-    return PhysX.wrapPointer(hit, PhysX.PxControllerShapeHit);
-}
 
 export function mathExtend() {
 
