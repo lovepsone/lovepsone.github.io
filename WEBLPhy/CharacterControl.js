@@ -4,7 +4,7 @@
 */
 
 let _manager, _ObstacleContext, _characters = [], _ControllerFilters;
-const _PtrByIdChar= new Map();
+const _PtrByIdChar = new Map();
 
 const FREEFALL = - 9.8, SPEEDJUMP = 3.2;
 
@@ -63,7 +63,7 @@ export class CharacterControl {
         r_callback.onShapeHit = (hit) => {
 
             const point = PhysX.wrapPointer(hit, PhysX.PxControllerShapeHit);
-            console.log(point);
+
             const ShapeHit = {
                 worldNormal: point.worldNormal.toArray(),
                 worldPos: point.worldPos.toArray(),
