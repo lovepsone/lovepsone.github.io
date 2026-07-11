@@ -119,7 +119,7 @@ export class WEBLPhy {
         option.FLAG_SHAPE_eSCENE_QUERY =  option.FLAG_SHAPE_eSCENE_QUERY || true;
         option.FLAG_SHAPE_eVISUALIZATION = option.FLAG_SHAPE_eVISUALIZATION || true;
         
-        return _RigidBody.add(mesh, option); // return id Body
+        return _RigidBody.add(mesh, option);
     }
 
     addCharacter(radius = 4, height = 8, position = [0, 70, 0]) {

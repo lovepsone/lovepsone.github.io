@@ -50,7 +50,7 @@ export class RigidDynamic {
 
     setMassAndInertia(vec3 = [0, 0, 0]) {
 
-        if (!vec3.isArray()) return;
+        if (!Array.isArray(vec3)) return;
 
         const tmp = new PhysX.PxVec3().fromArray(vec3);
         this.rigid.massSpaceInertiaTensor = tmp;
@@ -59,7 +59,7 @@ export class RigidDynamic {
 
     setLinearVelocity(vec3 = [0, 0, 0]) {
     
-        if (!vec3.isArray()) return;
+        if (!Array.isArray(vec3)) return;
 
         const tmp = new PhysX.PxVec3().fromArray(vec3);
         this.rigid.setLinearVelocity(tmp);
@@ -68,7 +68,7 @@ export class RigidDynamic {
 
     setAngularVelocity(vec3 = [0, 0, 0]) {
 
-        if (!vec3.isArray()) return;
+        if (!Array.isArray(vec3)) return;
 
         const tmp = new PhysX.PxVec3().fromArray(vec3);
         this.rigid.setAngularVelocity(tmp);
@@ -97,7 +97,7 @@ export class RigidDynamic {
 
     addForceAtPos(force = [0, 0, 0], pos = [0, 0, 0], isLocalForce = true, isLocalPos = true) {
 
-        if (!force.isArray() || !pos.isArray()) return;
+        if (!Array.isArray(force) || !Array.isArray(pos)) return;
 
         const _Force = new PhysX.PxVec3().fromArray(force),  _Pos = new PhysX.PxVec3().fromArray(pos);
 
@@ -112,7 +112,7 @@ export class RigidDynamic {
 
     addImpulseAtPos(impulse = [0, 0, 0], pos = [0, 0, 0], isLocalImpulse = true, isLocalPos = true) {
 
-        if (!impulse.isArray() || !pos.isArray()) return;
+        if (!Array.isArray(impulse) || !Array.isArray(pos)) return;
 
          const _Impulse = new PhysX.PxVec3().fromArray(impulse),  _Pos = new PhysX.PxVec3().fromArray(pos);
 
@@ -124,7 +124,7 @@ export class RigidDynamic {
 
     addTorque(torque = [0, 0, 0]) {
 
-        if (!torque.isArray()) return;
+        if (!Array.isArray(torque)) return;
         const tmpVec = new PhysX.PxVec3().fromArray(torque);
         this.rigid.addTorque(tmpVec);
     }

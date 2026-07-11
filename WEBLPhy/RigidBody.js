@@ -75,7 +75,6 @@ export class RigidBody {
 
             if (option.isKinematic) {
 
-                rigid.setRigidBodyFlag(PhysX.PxRigidBodyFlagEnum.eKINEMATIC, true);
                 rigid.setKinematic(true);
             }
         } else {
@@ -287,7 +286,7 @@ export class RigidBody {
         PhysX.destroy(Transform);
         PhysX.destroy(Vec3);
 
-        if (mesh.PhysX.id) return mesh.PhysX.id;
+        if (rigid) return rigid;
     }
 
     remove(mesh) {
