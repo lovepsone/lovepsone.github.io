@@ -262,7 +262,8 @@ export class RigidBody {
             mesh.PhysX = {
                 id: rigid.getPtr(),
                 isDynamic: true,
-                isKinematic: option.isKinematic
+                isKinematic: option.isKinematic,
+                rigid: rigid
             };
             _BodysDynamic.set(rigid.getPtr(), {body:rigid, mesh: mesh, isKinematic: option.isKinematic});
             this.scene.addActor(rigid.toBody());
@@ -272,6 +273,7 @@ export class RigidBody {
             mesh.PhysX = {
                 id: rigid.getPtr(),
                 isDynamic: false,
+                rigid: rigid
             };
             _BodysStatic.set(rigid.getPtr(), {body:rigid, mesh: mesh});
             this.scene.addActor(rigid.toBody());
