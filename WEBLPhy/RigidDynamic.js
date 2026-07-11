@@ -74,4 +74,24 @@ export class RigidDynamic {
         this.rigid.setAngularVelocity(tmp);
         PhysX.destroy(tmp);
     }
+
+    setMaxLinearVelocity(val) {
+
+        this.rigid.maxLinearVelocity = val;
+    }
+
+    setMaxAngularVelocity(val) {
+
+        this.rigid.maxAngularVelocity = val;
+    }
+
+    setLinearDamping(val) {
+
+        this.rigid.linearDamping = val;
+    }
+
+    setAngularDamping(val) {
+
+        this.rigid.angularDamping = val;
+    }
 }
