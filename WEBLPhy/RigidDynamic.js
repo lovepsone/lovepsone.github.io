@@ -94,4 +94,38 @@ export class RigidDynamic {
 
         this.rigid.angularDamping = val;
     }
+
+    addForceAtPos(force = [0, 0, 0], pos = [0, 0, 0], isLocalForce = true, isLocalPos = true) {
+
+        if (!force.isArray() || !pos.isArray()) return;
+
+        const _Force = new PhysX.PxVec3().fromArray(force),  _Pos = new PhysX.PxVec3().fromArray(pos);
+
+        if (isLocalForce && isLocalPos) PhysX.PxRigidBodyExt.prototype.addLocalForceAtLocalPos(this.rigid, _Force, _Pos);
+        else if (isLocalForce && !isLocalPos) PhysX.PxRigidBodyExt.prototype.addLocalForceAtPos(this.rigid, _Force, _Pos);
+        else if (!isLocalForce && isLocalPos) PhysX.PxRigidBodyExt.prototype.addForceAtLocalPos(this.rigid, _Force, _Pos);
+        else PhysX.PxRigidBodyExt.prototype.addForceAtPos(this.rigid, _Force, _Pos);
+
+        PhysX.destroy(_Force);
+        PhysX.destroy(_Pos);
+    }
+
+    addImpulseAtPos(impulse = [0, 0, 0], pos = [0, 0, 0], isLocalImpulse = true, isLocalPos = true) {
+
+        if (!impulse.isArray() || !pos.isArray()) return;
+
+         const _Impulse = new PhysX.PxVec3().fromArray(impulse),  _Pos = new PhysX.PxVec3().fromArray(pos);
+
+        if (isLocalImpulse && isLocalPos) PhysX.PxRigidBodyExt.prototype.addLocalForceAtLocalPos(this.rigid, _Impulse, _Pos, PhysX.PxForceModeEnum.eIMPULSE);
+        else if (isLocalImpulse && !isLocalPos) PhysX.PxRigidBodyExt.prototype.addLocalForceAtPos(this.rigid, _Impulse, _Pos, PhysX.PxForceModeEnum.eIMPULSE);
+        else if (!isLocalImpulse && isLocalPos) PhysX.PxRigidBodyExt.prototype.addForceAtLocalPos(this.rigid, _Impulse, _Pos, PhysX.PxForceModeEnum.eIMPULSE);
+        else PhysX.PxRigidBodyExt.prototype.addForceAtPos(this.rigid, _Impulse, _Pos, PhysX.PxForceModeEnum.eIMPULSE)
+    }
+
+    addTorque(torque = [0, 0, 0]) {
+
+        if (!torque.isArray()) return;
+        const tmpVec = new PhysX.PxVec3().fromArray(torque);
+        this.rigid.addTorque(tmpVec);
+    }
 }
