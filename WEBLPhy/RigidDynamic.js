@@ -48,11 +48,30 @@ export class RigidDynamic {
         PhysX.PxRigidBodyExt.prototype.updateMassAndInertia(this.rigid, this.rigid.getMass());
     }
 
-    set(vec3 = [0, 0, 0]) {
+    setMassAndInertia(vec3 = [0, 0, 0]) {
+
+        if (!vec3.isArray()) return;
 
         const tmp = new PhysX.PxVec3().fromArray(vec3);
-
         this.rigid.massSpaceInertiaTensor = tmp;
+        PhysX.destroy(tmp);
+    }
+
+    setLinearVelocity(vec3 = [0, 0, 0]) {
+    
+        if (!vec3.isArray()) return;
+
+        const tmp = new PhysX.PxVec3().fromArray(vec3);
+        this.rigid.setLinearVelocity(tmp);
+        PhysX.destroy(tmp);
+    }
+
+    setAngularVelocity(vec3 = [0, 0, 0]) {
+
+        if (!vec3.isArray()) return;
+
+        const tmp = new PhysX.PxVec3().fromArray(vec3);
+        this.rigid.setAngularVelocity(tmp);
         PhysX.destroy(tmp);
     }
 }

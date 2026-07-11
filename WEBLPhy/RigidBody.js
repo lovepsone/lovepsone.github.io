@@ -26,42 +26,6 @@ export class RigidBody {
         });
     }
 
-    setLinearVelocity(id, vec3) {
-
-        const rigid = _BodysDynamic.get(id);
-
-        if (rigid !== undefined) {
-
-            if (vec3.isArray()) {
-
-                const tmpL = new PhysX.PxVec3().fromArray(vec3);
-                rigid.body.setLinearVelocity(tmpL);
-                PhysX.destroy(tmpL);
-            }
-        } else {
-
-            console.warn('WEBLPhy: this id does not exist in RigidDynamic: ', id);
-        }
-    }
-
-    setAngularVelocity(id, vec3) {
-
-        const rigid = _BodysDynamic.get(id);
-
-        if (rigid !== undefined) {
-
-            if (vec3.isArray()) {
-
-                const tmpA = new PhysX.PxVec3().fromArray(vec3);
-                rigid.body.setAngularVelocity(tmpA);
-                PhysX.destroy(tmpA);
-            }
-        } else {
-
-            console.warn('WEBLPhy: this id does not exist in RigidDynamic: ', id);
-        }
-    }
-
     add(mesh, 
         option = {
             mass: 0,
