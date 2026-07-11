@@ -3,6 +3,9 @@
 * @ver - 0.0.1 
 */
 
+import { RigidDynamic } from './RigidDynamic.js';
+import { RigidStatic } from './RigidStatic.js';
+
 let _BodysDynamic = new Map(), _BodysStatic = new Map(); 
 
 export class RigidBody {
@@ -18,11 +21,45 @@ export class RigidBody {
 
         _BodysDynamic.forEach((value, key, map) => {
 
-            const position = value.body.getGlobalPose().get_p();
-            const quat = value.body.getGlobalPose().get_q();
-            value.mesh.position.fromArray(position.toArray());
-            value.mesh.quaternion.fromArray(quat.toArray());
+            value.mesh.position.fromArray(value.body.getPosition());
+            value.mesh.quaternion.fromArray(value.body.getQuat());
         });
+    }
+
+    setLinearVelocity(id, vec3) {
+
+        const rigid = _BodysDynamic.get(id);
+
+        if (rigid !== undefined) {
+
+            if (vec3.isArray()) {
+
+                const tmpL = new PhysX.PxVec3().fromArray(vec3);
+                rigid.body.setLinearVelocity(tmpL);
+                PhysX.destroy(tmpL);
+            }
+        } else {
+
+            console.warn('WEBLPhy: this id does not exist in RigidDynamic: ', id);
+        }
+    }
+
+    setAngularVelocity(id, vec3) {
+
+        const rigid = _BodysDynamic.get(id);
+
+        if (rigid !== undefined) {
+
+            if (vec3.isArray()) {
+
+                const tmpA = new PhysX.PxVec3().fromArray(vec3);
+                rigid.body.setAngularVelocity(tmpA);
+                PhysX.destroy(tmpA);
+            }
+        } else {
+
+            console.warn('WEBLPhy: this id does not exist in RigidDynamic: ', id);
+        }
     }
 
     add(mesh, 
@@ -70,16 +107,17 @@ export class RigidBody {
 
         if (option.isDynamic && type !== 'PlaneGeometry') {
 
-            rigid = this.physics.createRigidDynamic(Transform);
+            rigid = new RigidDynamic(this.physics, Transform)
 
             if (option.isKinematic) {
 
                 rigid.setRigidBodyFlag(PhysX.PxRigidBodyFlagEnum.eKINEMATIC, true);
+                rigid.setKinematic(true);
             }
         } else {
 
             option.isDynamic = false;
-            rigid = this.physics.createRigidStatic(Transform);
+            rigid = new RigidStatic(this.physics, Transform);
         }
 
         switch(type) {
@@ -89,7 +127,7 @@ export class RigidBody {
                 let h = mesh.geometry.parameters.height * 0.5;
                 geometry = new PhysX.PxBoxGeometry(w, 1, h);
                 //geometry = PhysX.PxPlaneGeometry();
-                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid, geometry, material, flags);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
                 
             }
             break;
@@ -99,14 +137,14 @@ export class RigidBody {
                 let h = mesh.geometry.parameters.height * 0.5;
                 let d = mesh.geometry.parameters.depth * 0.5;
                 geometry = new PhysX.PxBoxGeometry(w, h, d);
-                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid, geometry, material, flags);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
             }
             break;
 
             case 'SphereGeometry': {
                 let r = mesh.geometry.parameters.radius;
                 geometry = new PhysX.PxSphereGeometry(r);
-                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid, geometry, material, flags);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
             }
             break;
 
@@ -122,7 +160,7 @@ export class RigidBody {
                 const relativePose = new PhysX.PxTransform(PhysX.PxIDENTITYEnum.PxIdentity);
                 relativePose.set_q(Quat_relative);
 
-                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid, geometry, material, flags);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
                 shape.setLocalPose(relativePose);
                 PhysX.destroy(Vec3_z);
                 PhysX.destroy(Quat_relative);
@@ -164,7 +202,7 @@ export class RigidBody {
                 const scale = new PhysX.PxMeshScale(s, r);
 
                 geometry = new PhysX.PxConvexMeshGeometry(pxConvexMesh, scale);
-                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid, geometry, material, flags);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
 
                 PhysX.destroy(pointsVector);
                 PhysX.destroy(s);
@@ -222,7 +260,7 @@ export class RigidBody {
                     pxTriangleMesh.refCnt++;
                 }
 
-                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid, geometry, material, flags);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
 
                 PhysX.destroy(indexVector);
                 PhysX.destroy(pointsVector);
@@ -255,30 +293,27 @@ export class RigidBody {
         if (option.isDynamic && shape) {
 
             rigid.setMass(option.mass);
-            PhysX.PxRigidBodyExt.prototype.updateMassAndInertia(rigid, option.mass);
-            //Vec3.fromArray([0, 10, 0]);
-            //rigid.setMassSpaceInertiaTensor(Vec3);
+            rigid.updateMassAndInertia();
     
             mesh.PhysX = {
-                id: rigid.ptr,
+                id: rigid.getPtr(),
                 isDynamic: true,
                 isKinematic: option.isKinematic
             };
-            _BodysDynamic.set(rigid.ptr, {body:rigid, mesh: mesh, isKinematic: option.isKinematic});
-            this.scene.addActor(rigid);
+            _BodysDynamic.set(rigid.getPtr(), {body:rigid, mesh: mesh, isKinematic: option.isKinematic});
+            this.scene.addActor(rigid.toBody());
 
         } else if (shape) {
 
             mesh.PhysX = {
-                id: rigid.ptr,
+                id: rigid.getPtr(),
                 isDynamic: false,
             };
-            _BodysStatic.set(rigid.ptr, {body:rigid, mesh: mesh});
-            this.scene.addActor(rigid);
+            _BodysStatic.set(rigid.getPtr(), {body:rigid, mesh: mesh});
+            this.scene.addActor(rigid.toBody());
         } else {
 
             console.warn('WEBLPhy: This type of geometry is not supported!:', type);
-            console.log(mesh);
         }
 
         PhysX.destroy(FilterData);
@@ -295,12 +330,12 @@ export class RigidBody {
 
             if (mesh.PhysX.isDynamic) {
 
-                this.scene.removeActor(_BodysDynamic.get(mesh.PhysX.id).body);
+                this.scene.removeActor(_BodysDynamic.get(mesh.PhysX.id).body.toBody());
                 _BodysDynamic.delete(mesh.PhysX.id); 
 
             } else if (!mesh.PhysX.isDynamic) {
 
-                this.scene.removeActor(_BodysStatic.get(mesh.PhysX.id).body);
+                this.scene.removeActor(_BodysStatic.get(mesh.PhysX.id).body.toBody());
                 _BodysStatic.delete(mesh.PhysX.id);
             } else {
 
