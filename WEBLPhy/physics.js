@@ -93,7 +93,7 @@ export class WEBLPhy {
         }
     }
 
-    addMesh(mesh,
+    addMeshRigidBody(mesh,
         option = {
             mass: 0,
             isDynamic: false,
