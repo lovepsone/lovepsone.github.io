@@ -34,18 +34,18 @@
 				const box = new THREE.Mesh( geometry, material );
 				box.position.set( Math.random() - 25, Math.random() * 300, Math.random() - 25 );
 				scene.add( box );
-				phy.addMesh( box, { mass: 100, isDynamic: true } );
+				phy.addMeshRigidBody( box, { mass: 100, isDynamic: true } );
 
 				const sphere = new THREE.Mesh( geometry2, material );
 				sphere.position.set( Math.random() - 15, Math.random() * 700, Math.random() - 15 );
 				scene.add( sphere );
-				phy.addMesh( sphere, { mass: 30, isDynamic: true } );
+				phy.addMeshRigidBody( sphere, { mass: 30, isDynamic: true } );
 			}
 
 			const pg = new THREE.BoxGeometry(300, 0.1, 300);
 			const plane = new THREE.Mesh( pg, new THREE.MeshBasicMaterial( { color: 0x00aa00 } ) );
 			scene.add( plane );
-			phy.addMesh( plane );
+			phy.addMeshRigidBody( plane );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			//renderer.setClearColor(0x808080);
