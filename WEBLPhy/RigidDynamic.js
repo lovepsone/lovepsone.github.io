@@ -95,7 +95,7 @@ export class RigidDynamic {
         this.rigid.angularDamping = val;
     }
 
-    addForceAtPos(force = [0, 0, 0], pos = [0, 0, 0], isLocalForce = true, isLocalPos = true) {
+    addForceAtPos(force = [0, 0, 0], pos = [0, 0, 0], isLocalForce = false, isLocalPos = false) {
 
         if (!Array.isArray(force) || !Array.isArray(pos)) return;
 
@@ -110,11 +110,11 @@ export class RigidDynamic {
         PhysX.destroy(_Pos);
     }
 
-    addImpulseAtPos(impulse = [0, 0, 0], pos = [0, 0, 0], isLocalImpulse = true, isLocalPos = true) {
+    addImpulseAtPos(impulse = [0, 0, 0], pos = [0, 0, 0], isLocalImpulse = false, isLocalPos = false) {
 
         if (!Array.isArray(impulse) || !Array.isArray(pos)) return;
 
-         const _Impulse = new PhysX.PxVec3().fromArray(impulse),  _Pos = new PhysX.PxVec3().fromArray(pos);
+        const _Impulse = new PhysX.PxVec3().fromArray(impulse),  _Pos = new PhysX.PxVec3().fromArray(pos);
 
         if (isLocalImpulse && isLocalPos) PhysX.PxRigidBodyExt.prototype.addLocalForceAtLocalPos(this.rigid, _Impulse, _Pos, PhysX.PxForceModeEnum.eIMPULSE);
         else if (isLocalImpulse && !isLocalPos) PhysX.PxRigidBodyExt.prototype.addLocalForceAtPos(this.rigid, _Impulse, _Pos, PhysX.PxForceModeEnum.eIMPULSE);
@@ -127,5 +127,32 @@ export class RigidDynamic {
         if (!Array.isArray(torque)) return;
         const tmpVec = new PhysX.PxVec3().fromArray(torque);
         this.rigid.addTorque(tmpVec);
+    }
+
+    addForce(vec3 = [0, 0, 0]) {
+
+        if (!Array.isArray(vec3)) return;
+
+        const tmp = new PhysX.PxVec3().fromArray(vec3);
+        this.rigid.addForce(tmp, PhysX.PxForceModeEnum.eFORCE, false);
+        PhysX.destroy(tmp);
+    }
+
+    addImpulse(vec3 = [0, 0, 0]) {
+
+        if (!Array.isArray(vec3)) return;
+
+        const tmp = new PhysX.PxVec3().fromArray(vec3);
+        this.rigid.addForce(tmp, PhysX.PxForceModeEnum.eIMPULSE);
+        PhysX.destroy(tmp);
+    }
+
+    addVelocityChange(vec3 = [0, 0, 0]) {
+
+        if (!Array.isArray(vec3)) return;
+
+        const tmp = new PhysX.PxVec3().fromArray(vec3);
+        this.rigid.addForce(tmp, PhysX.PxForceModeEnum.eVELOCITY_CHANGE);
+        PhysX.destroy(tmp);
     }
 }
