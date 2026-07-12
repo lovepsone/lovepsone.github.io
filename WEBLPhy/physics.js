@@ -17,11 +17,11 @@ globalThis.PhysX = loadPhysX;
 
 export class WEBLPhy {
 
-    constructor(option = {gravity: [0, -9.8, 0], THREEScene: null, isDebug: true}) {
+    constructor(option = {gravity: [0, -9.8, 0], THREEScene: null, isDebug: false}) {
 
         this.THREEScene = option.THREEScene;
         _scope = this;
-        option.isDebug = option.isDebug || true;
+        option.isDebug = option.isDebug || false;
         option.gravity = option.gravity || [0, -9.8, 0];
         _isDebug = option.isDebug;
         this.init(option.gravity);
