@@ -21,6 +21,11 @@ export class RigidBody {
 
         _BodysDynamic.forEach((value, key, map) => {
 
+            if (value.isKinematic) {
+
+                //value.body.setKinematicTarget();
+            }
+
             value.mesh.position.fromArray(value.body.getPosition());
             value.mesh.quaternion.fromArray(value.body.getQuat());
         });
@@ -66,6 +71,7 @@ export class RigidBody {
         const Transform = new PhysX.PxTransform(PhysX.PxIDENTITYEnum.PxIdentity);
         const Vec3 = new PhysX.PxVec3(mesh.position.x, mesh.position.y, mesh.position.z);
         const Quat = new PhysX.PxQuat(mesh.quaternion.x, mesh.quaternion.y, mesh.quaternion.z, mesh.quaternion.w);
+
         Transform.set_p(Vec3);
         Transform.set_q(Quat);
 
@@ -77,6 +83,13 @@ export class RigidBody {
 
                 rigid.setKinematic(true);
             }
+        /*} else if (type == 'PlaneGeometry') {
+
+            const v3Plane = new PhysX.PxVec3(0, 0, 1); 
+            const qPlane = new PhysX.PxQuat(Math.PI / 2, v3Plane);
+            option.isDynamic = false;
+            Transform.set_q(qPlane);
+            rigid = new RigidStatic(this.physics, Transform);*/
         } else {
 
             option.isDynamic = false;
@@ -131,20 +144,34 @@ export class RigidBody {
             }
             break;
 
-            /*case 'ConvexGeometry': {
+            case 'ConeGeometry': {
 
                 console.log(mesh);
-                let convexVerts = [];
+                let r = mesh.geometry.parameters.radius;
+                let h = mesh.geometry.parameters.height;
+
+                mesh.geometry.rotateZ(-Math.PI / 2);
+                const cone = new PhysX.PxConvexCoreCone(h, r);
+                geometry = new PhysX.PxConvexCoreGeometryFactory.prototype.createFromCone(cone, 0.2);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
+            }
+            break;
+
+            case 'ConvexGeometry': {
+
+                console.log(mesh);
 
                 const points = mesh.geometry.attributes.position.array;
+                const index = mesh.geometry.index.array;
+
                 const pointsVector = new PhysX.PxArray_PxVec3();
 
-                for (let i = 0; i < points.length; i += 3) {
+                for (let i = 0; i < index.length; i ++) {
 
                     const tmpVec3 = new PhysX.PxVec3(
-                        points[i + 0],
-                        points[i + 1],
-                        points[i + 2],
+                        points[index[i] + 0],
+                        points[index[i] + 1],
+                        points[index[i] + 2],
                     );
 
                     pointsVector.pushBack(tmpVec3);
@@ -153,14 +180,16 @@ export class RigidBody {
 
 
                 const ConvexDesc = new PhysX.PxConvexMeshDesc();
+                const ConvexFlags = new PhysX.PxConvexFlags(PhysX.PxConvexFlagEnum.eCOMPUTE_CONVEX);
                 ConvexDesc.points.count = pointsVector.size();
                 ConvexDesc.points.stride = 12;
                 ConvexDesc.points.data = pointsVector.begin();
                 ConvexDesc.points.flags = PhysX.PxConvexFlagEnum.eCOMPUTE_CONVEX;
 
-                const pxConvexMesh = PhysX.CreateConvexMesh(this.cookingParams, ConvexDesc);
+                console.log(22222);
+                const pxConvexMesh = PhysX.PxTopLevelFunctions.prototype.CreateConvexMesh(this.cookingParams, ConvexDesc);
 
-                const s = new PhysX.PxVec3().fromArray(mesh.scale.toArray());
+                /*const s = new PhysX.PxVec3().fromArray(mesh.scale.toArray());
                 const r = new PhysX.PxQuat(0, 0, 0, 1);
                 const scale = new PhysX.PxMeshScale(s, r);
 
@@ -169,9 +198,9 @@ export class RigidBody {
 
                 PhysX.destroy(pointsVector);
                 PhysX.destroy(s);
-                PhysX.destroy(r);
+                PhysX.destroy(r);*/
             }
-            break;*/
+            break;
 
             case 'TriangleGeometry': {
 
@@ -278,6 +307,7 @@ export class RigidBody {
             this.scene.addActor(rigid.toBody());
         } else {
 
+            //this.scene.addActor(rigid);
             console.warn('WEBLPhy: This type of geometry is not supported!:', type);
         }
 
