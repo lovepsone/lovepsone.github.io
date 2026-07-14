@@ -75,6 +75,11 @@ export class RigidBody {
         Transform.set_p(Vec3);
         Transform.set_q(Quat);
 
+        const Vec3_z = new PhysX.PxVec3(0, 0, 1);
+        const Quat_relative = new PhysX.PxQuat(Math.PI / 2, Vec3_z);
+        const RelativePose = new PhysX.PxTransform(PhysX.PxIDENTITYEnum.PxIdentity);
+        RelativePose.set_q(Quat_relative);
+
         if (option.isDynamic && type !== 'PlaneGeometry') {
 
             rigid = new RigidDynamic(this.physics, Transform)
@@ -118,7 +123,9 @@ export class RigidBody {
             break;
 
             case 'SphereGeometry': {
+
                 let r = mesh.geometry.parameters.radius;
+
                 geometry = new PhysX.PxSphereGeometry(r);
                 shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
             }
@@ -128,32 +135,34 @@ export class RigidBody {
 
                 let r = mesh.geometry.parameters.radius;
                 let h = mesh.geometry.parameters.height;
+
                 geometry = new PhysX.PxCapsuleGeometry(r, h / 2);
-
-                const Vec3_z = new PhysX.PxVec3(0, 0, 1);
-                const Quat_relative = new PhysX.PxQuat(Math.PI / 2, Vec3_z);
-                
-                const relativePose = new PhysX.PxTransform(PhysX.PxIDENTITYEnum.PxIdentity);
-                relativePose.set_q(Quat_relative);
-
                 shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
                 shape.setLocalPose(relativePose);
-                PhysX.destroy(Vec3_z);
-                PhysX.destroy(Quat_relative);
-                PhysX.destroy(relativePose);
             }
             break;
 
             case 'ConeGeometry': {
 
-                console.log(mesh);
                 let r = mesh.geometry.parameters.radius;
                 let h = mesh.geometry.parameters.height;
 
-                mesh.geometry.rotateZ(-Math.PI / 2);
                 const cone = new PhysX.PxConvexCoreCone(h, r);
                 geometry = new PhysX.PxConvexCoreGeometryFactory.prototype.createFromCone(cone, 0.2);
                 shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
+                shape.setLocalPose(RelativePose);
+            }
+            break;
+
+            case 'CylinderGeometry': {
+
+                let r = mesh.geometry.parameters.radiusTop;
+                let h = mesh.geometry.parameters.height;
+                const Cylinder = new PhysX.PxConvexCoreCylinder(h, r);
+
+                geometry = new PhysX.PxConvexCoreGeometryFactory.prototype.createFromCylinder(Cylinder, 0.2);
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
+                shape.setLocalPose(RelativePose);
             }
             break;
 
@@ -186,7 +195,6 @@ export class RigidBody {
                 ConvexDesc.points.data = pointsVector.begin();
                 ConvexDesc.points.flags = PhysX.PxConvexFlagEnum.eCOMPUTE_CONVEX;
 
-                console.log(22222);
                 const pxConvexMesh = PhysX.PxTopLevelFunctions.prototype.CreateConvexMesh(this.cookingParams, ConvexDesc);
 
                 /*const s = new PhysX.PxVec3().fromArray(mesh.scale.toArray());
@@ -315,6 +323,9 @@ export class RigidBody {
         PhysX.destroy(flags);
         PhysX.destroy(Transform);
         PhysX.destroy(Vec3);
+        PhysX.destroy(Vec3_z);
+        PhysX.destroy(Quat_relative);
+        PhysX.destroy(RelativePose);
 
         if (rigid) return rigid;
     }
