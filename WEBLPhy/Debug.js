@@ -18,6 +18,7 @@ export class Debug {
         this.scene.setVisualizationParameter(PhysX.eWORLD_AXES, 1);
         this.scene.setVisualizationParameter(PhysX.eACTOR_AXES, 1);
         this.scene.setVisualizationParameter(PhysX.eCOLLISION_SHAPES, 1);
+        this.scene.setVisualizationParameter(PhysX.eBODY_AXES, 1);
 
         this.colors = {
             [PhysX.PxDebugColorEnum.eARGB_BLACK]:     [  0,   0,   0],
@@ -46,6 +47,8 @@ export class Debug {
 
     DrawLine(from, to, color) {
 
+        if (color != undefined) {
+
         const [r, g, b] = color;
 
         _mesh.geometry.attributes.position.setXYZ(this.index, from[0], from[1], from[2]);
@@ -53,6 +56,7 @@ export class Debug {
  
         _mesh.geometry.attributes.position.setXYZ(this.index, to[0], to[1], to[2]);
         _mesh.geometry.attributes.color.setXYZ(this.index++, r, g, b);
+        }
     }
 
     Draw() {
