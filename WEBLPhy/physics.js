@@ -41,6 +41,7 @@ export class WEBLPhy {
         const Tolerances = new PhysX.PxTolerancesScale();
         const cookingParams = new PhysX.PxCookingParams(Tolerances);
         cookingParams.suppressTriangleMeshRemapTable = true;
+        cookingParams.convexMeshCookingType = PhysX.PxConvexMeshCookingTypeEnum.eQUICKHULL;
 
         _physics = PhysX.CreatePhysics(version, Foundation, Tolerances);
     
@@ -53,7 +54,7 @@ export class WEBLPhy {
         SceneDesc.flags.raise(PhysX.PxSceneFlagEnum.eENABLE_ACTIVE_ACTORS);
         SceneDesc.simulationEventCallback = SimulationCallback;
         _scene = _physics.createScene(SceneDesc);
-        _scene.setBounceThresholdVelocity(0.001); //?
+        _scene.setBounceThresholdVelocity(0.01); //?
         _scene.setGravity(Vec3);
     
         _RigidBody = new RigidBody(_physics, _scene, cookingParams);
@@ -104,7 +105,8 @@ export class WEBLPhy {
             restitution: 0.1,
             FLAG_SHAPE_eSIMULATION: true,
             FLAG_SHAPE_eSCENE_QUERY: true,
-            FLAG_SHAPE_eVISUALIZATION: true
+            FLAG_SHAPE_eVISUALIZATION: true,
+            FLAG_SHAPE_eTRIGGER: false
         }
     ) {
 
@@ -118,6 +120,7 @@ export class WEBLPhy {
         option.FLAG_SHAPE_eSIMULATION = option.FLAG_SHAPE_eSIMULATION || true;
         option.FLAG_SHAPE_eSCENE_QUERY =  option.FLAG_SHAPE_eSCENE_QUERY || true;
         option.FLAG_SHAPE_eVISUALIZATION = option.FLAG_SHAPE_eVISUALIZATION || true;
+        option.FLAG_SHAPE_eTRIGGER = option.FLAG_SHAPE_eTRIGGER || false;
         
         return _RigidBody.add(mesh, option);
     }

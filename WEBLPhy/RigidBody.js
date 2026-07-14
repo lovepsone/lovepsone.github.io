@@ -43,7 +43,8 @@ export class RigidBody {
             restitution: 0.1,
             FLAG_SHAPE_eSIMULATION: true,
             FLAG_SHAPE_eSCENE_QUERY: true,
-            FLAG_SHAPE_eVISUALIZATION: true
+            FLAG_SHAPE_eVISUALIZATION: true,
+            FLAG_SHAPE_eTRIGGER: false
         }) {
 
         let type = 'BoxGeometry', shape, geometry, rigid;
@@ -83,6 +84,7 @@ export class RigidBody {
         if (option.isDynamic && type !== 'PlaneGeometry') {
 
             rigid = new RigidDynamic(this.physics, Transform)
+            rigid.toBody().setAngularDamping(0.5);
 
             if (option.isKinematic) {
 
@@ -286,6 +288,12 @@ export class RigidBody {
             shape.setFlag(PhysX.PxShapeFlagEnum.eSIMULATION_SHAPE, option.FLAG_SHAPE_eSIMULATION);
             shape.setFlag(PhysX.PxShapeFlagEnum.eVISUALIZATION, option.FLAG_SHAPE_eVISUALIZATION);
 
+            if (option.FLAG_SHAPE_eTRIGGER) {
+
+                shape.setFlag(PhysX.PxShapeFlagEnum.eSIMULATION_SHAPE, false);
+                shape.setFlag(PhysX.PxShapeFlagEnum.eTRIGGER_SHAPE, option.FLAG_SHAPE_eTRIGGER);
+            }
+
             shape.setSimulationFilterData(this.FilterData);
             shape.setQueryFilterData(this.FilterData);
         }
@@ -315,7 +323,6 @@ export class RigidBody {
             this.scene.addActor(rigid.toBody());
         } else {
 
-            //this.scene.addActor(rigid);
             console.warn('WEBLPhy: This type of geometry is not supported!:', type);
         }
 
