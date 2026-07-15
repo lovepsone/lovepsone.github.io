@@ -34,8 +34,7 @@ export class RigidBody {
     add(mesh, 
         option = {
             mass: 0,
-            isDynamic:
-            false,
+            isDynamic: false,
             isKinematic: false,
             type_geometry: '',
             static_friction: 0.1,
@@ -58,7 +57,7 @@ export class RigidBody {
             return;
         }
 
-        if (option.type_geometry === 'TriangleGeometry' /*|| option.type_geometry === 'ConvexGeometry'*/) {
+        if (option.type_geometry === 'TriangleGeometry' || option.type_geometry === 'HeightField'/*|| option.type_geometry === 'ConvexGeometry'*/) {
 
             type = option.type_geometry;
         }
@@ -81,7 +80,7 @@ export class RigidBody {
         const RelativePose = new PhysX.PxTransform(PhysX.PxIDENTITYEnum.PxIdentity);
         RelativePose.set_q(Quat_relative);
 
-        if (option.isDynamic && type !== 'PlaneGeometry') {
+        if (option.isDynamic && type !== ('PlaneGeometry' || 'HeightField')) {
 
             rigid = new RigidDynamic(this.physics, Transform)
             rigid.toBody().setAngularDamping(0.5);
@@ -140,7 +139,7 @@ export class RigidBody {
 
                 geometry = new PhysX.PxCapsuleGeometry(r, h / 2);
                 shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
-                shape.setLocalPose(relativePose);
+                shape.setLocalPose(RelativePose);
             }
             break;
 
@@ -272,13 +271,62 @@ export class RigidBody {
             break;
 
             case 'HeightField': {
-                let sampleArray = new PhysX.PxArray_PxHeightFieldSample();
-                let heightFieldDesc = new PhysX.PxHeightFieldDesc();
-                ///heightFieldDesc.nbColumns = numberOfColumns
-                //heightFieldDesc.nbRows = numberOfRows
-                heightFieldDesc.format = PhysX.PxHeightFieldFormatEnum.eS16_TM;
 
-                heightFieldDesc.samples.stride = 0
+                const data = option.HeightField.data;
+                const rows = option.HeightField.rows;
+                const cols = option.HeightField.cols;
+
+                const sampleArray = new PhysX.PxArray_PxHeightFieldSample();
+                const sample = new PhysX.PxHeightFieldSample();
+                const heightFieldDesc = new PhysX.PxHeightFieldDesc();
+
+                /*for (let i = 0; i < rows; i++) {
+
+                    for (let j = 0; j < cols; j++) {
+
+                        sample.height = data[i*j];
+
+                        if (i % 2 != j % 2) {
+
+                            sample.clearTessFlag()
+                        } else {
+
+                            sample.setTessFlag();
+                        }
+
+                        sampleArray.pushBack(sample);
+                    }
+                }*/
+
+                for (let i = 0 ; i < data.length; i++) {
+
+                    sample.height = data[i];
+                    sample.setTessFlag();
+                    sampleArray.pushBack(sample);
+                }
+                heightFieldDesc.nbColumns = cols;
+                heightFieldDesc.nbRows = rows;
+                heightFieldDesc.format = PhysX.PxHeightFieldFormatEnum.eS16_TM;
+                heightFieldDesc.samples.stride = 4;
+                heightFieldDesc.samples.data = sampleArray.begin();
+                const pxHeightField = new PhysX.CreateHeightField(heightFieldDesc);
+
+                geometry = new PhysX.PxHeightFieldGeometry(pxHeightField, flags, 1, 1, 1);
+
+                if (geometry.releaseWithGeometry) {
+
+                    if (geometry.refCnt > 0) geometry.acquireReference();
+                    geometry.refCnt++;
+                }
+
+                shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
+
+                Quat_relative.fromArray([0, 0, 0, 1]);
+                Vec3_z.fromArray([-cols * 0.5, 0, -rows * 0.5]);
+                RelativePose.set_q(Quat_relative);
+                RelativePose.set_p(Vec3_z);
+
+                shape.setLocalPose(RelativePose);
             }
         }
 

@@ -27,7 +27,7 @@ export class WEBLPhy {
         this.init(option.gravity);
     }
 
-    init(gravity = [0, -9.8, 0]) {
+    init(gravity = [0, -9.8, 0], isContinuousCollisionDetection = false) {
 
         mathExtend();
         const version = PhysX.PHYSICS_VERSION;
@@ -44,7 +44,9 @@ export class WEBLPhy {
         cookingParams.convexMeshCookingType = PhysX.PxConvexMeshCookingTypeEnum.eQUICKHULL;
 
         _physics = PhysX.CreatePhysics(version, Foundation, Tolerances);
-    
+
+        PhysX.PxTopLevelFunctions.prototype.InitExtensions(_physics);
+
         const Vec3 = new PhysX.PxVec3().fromArray(gravity);
         const SceneDesc = new PhysX.PxSceneDesc(Tolerances);
         //SceneDesc.set_gravity(Vec3);
@@ -53,10 +55,23 @@ export class WEBLPhy {
         SceneDesc.set_filterShader(PhysX.DefaultFilterShader());
         SceneDesc.flags.raise(PhysX.PxSceneFlagEnum.eENABLE_ACTIVE_ACTORS);
         SceneDesc.simulationEventCallback = SimulationCallback;
+
+        if (isContinuousCollisionDetection) {
+
+            SceneDesc.flags.raise(PhysX.PxSceneFlagEnum.eENABLE_CCD);
+            // нужно добавить флаги ССD всем остальным акторам кроме киниматических
+        }
+    
         _scene = _physics.createScene(SceneDesc);
         _scene.setBounceThresholdVelocity(0.01); //?
         _scene.setGravity(Vec3);
-    
+
+        const PvdSceneClient = _scene.getScenePvdClient();
+
+        if (PvdSceneClient) {
+
+        }
+
         _RigidBody = new RigidBody(_physics, _scene, cookingParams);
         _CharacterControl = new CharacterControl(_physics, _scene);
 
@@ -81,6 +96,8 @@ export class WEBLPhy {
 
         SimulationCallback.onContact = (pairHeader, pairs, nbPairs) => {
 
+            const pHeader = PhysX.wrapPointer(pairHeader, PhysX.PxContactPairHeader);
+            const pWrapped = PhysX.wrapPointer(pairs, PhysX.PxContactPair);
         }
 
         SimulationCallback.onTrigger = (pairs, count) => {
@@ -121,7 +138,14 @@ export class WEBLPhy {
         option.FLAG_SHAPE_eSCENE_QUERY =  option.FLAG_SHAPE_eSCENE_QUERY || true;
         option.FLAG_SHAPE_eVISUALIZATION = option.FLAG_SHAPE_eVISUALIZATION || true;
         option.FLAG_SHAPE_eTRIGGER = option.FLAG_SHAPE_eTRIGGER || false;
-        
+
+        if (option.type_geometry === 'HeightField') {
+
+            option.HeightField.data =  option.HeightField.data || null;
+            option.HeightField.rows = option.HeightField.rows || 128;
+            option.HeightField.cols = option.HeightField.cols || 128;
+        }
+
         return _RigidBody.add(mesh, option);
     }
 
