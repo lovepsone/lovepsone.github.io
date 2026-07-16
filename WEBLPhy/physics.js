@@ -11,18 +11,19 @@ import {mathExtend} from './Match.js';
 
 const isServer = false;
 let _scope, _physics, _scene, _RigidBody, _CharacterControl, _Debug;
-let _isDebug = true, _isStep = false;
+let _isDebug = true, _isStep = false, _subSteps = 4;
 
 globalThis.PhysX = loadPhysX;
 
 export class WEBLPhy {
 
-    constructor(option = {gravity: [0, -9.8, 0], THREEScene: null, isDebug: false}) {
+    constructor(option = {gravity: [0, -9.8, 0], THREEScene: null, isDebug: false, SubSteps: 4}) {
 
         this.THREEScene = option.THREEScene;
         _scope = this;
         option.isDebug = option.isDebug || false;
         option.gravity = option.gravity || [0, -9.8, 0];
+        _subSteps =  option.SubSteps || 4;
         _isDebug = option.isDebug;
         this.init(option.gravity);
     }
@@ -159,13 +160,16 @@ export class WEBLPhy {
         if (CharacterControl) return _CharacterControl;
     }
 
-    stepSimulation(Delta, TimeStep = 1/60) {
+    stepSimulation(Delta, TimeStep = 1000/60) {
 
         _isStep = false;
         if (_scene) {
-            _scene.simulate(TimeStep);
-            _scene.fetchResults(true);
 
+            for (let i = 0; i < _subSteps; i++) {
+
+                _scene.simulate(TimeStep / (1000 * _subSteps));
+                _scene.fetchResults(true);
+            }
             _isStep = true;
             _RigidBody.step();
 
