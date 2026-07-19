@@ -25,13 +25,20 @@ export class CharacterControl {
         _ControllerFilters = new PhysX.PxControllerFilters();
     }
 
-    add(radius = 4, height = 8, position = [0, 70, 0]) {
+    add(option = {radius: 4, height: 8, position: [0, 70, 0], mass: 1, maxJumpHeight: 50, walkSpeed: 2.5}) {
+
+        option.height = option.height || 10;
+        option.radius = option.radius || 4;
+        option.position = option.position || [0, option.height, 0];
+        option.mass = option.mass || 1;
+        option.maxJumpHeight = option.maxJumpHeight || 50;
+        option.walkSpeed = option.walkSpeed || 2.5;
 
         const r_callback = new PhysX.PxUserControllerHitReportImpl();
         const b_callback = new PhysX.PxControllerBehaviorCallbackImpl();
         const ccd = new PhysX.PxCapsuleControllerDesc();
-        ccd.height = height;
-        ccd.radius = radius;
+        ccd.height = option.height;
+        ccd.radius = option.radius;
         ccd.stepOffset = 0.1 // Смещение шага
         ccd.contactOffset = 4.001; // доп.слой вокруг капсулы
         ccd.maxJumpHeight = 4.001; // размер ограничивающего объема вниз
@@ -43,19 +50,19 @@ export class CharacterControl {
         ccd.behaviorCallback = b_callback;
         ccd.nonWalkableMode = PhysX.PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING; // PhysX.PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING;
 
-        const pos = new PhysX.PxExtendedVec3(position[0], position[1], position[2]);
+        const pos = new PhysX.PxExtendedVec3(option.position[0], option.position[1], option.position[2]);
         const controller = _manager.createController(ccd);
         controller.setPosition(pos);
 
         _characters.push({Character: controller,
-            walkSpeed: 2.13,
+            walkSpeed: option.walkSpeed,
             isDownCollision: false,
             isUpCollision: false,
             isSideCollision: false,
             velocityY: 0,
-            maxJumpHeight: 40,
+            maxJumpHeight: option.maxJumpHeight,
             isJump: false,
-            mass: 15,
+            mass: option.mass,
         });
 
         _PtrByIdChar.set(controller.ptr, {id: _characters.length - 1});
@@ -166,7 +173,7 @@ export class CharacterControl {
         if (_characters[id]) {
 
             const g_y = FREEFALL * timeStep * _characters[id].mass;
-            const j_y = SPEEDJUMP;
+            const j_y = SPEEDJUMP * (_characters[id].mass / 10);
 
             let x = 0, z = 0, y = g_y, tangle = 0;
 

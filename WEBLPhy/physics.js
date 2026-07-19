@@ -158,9 +158,16 @@ export class WEBLPhy {
         return _RigidBody.add(mesh, option);
     }
 
-    addCharacter(radius = 4, height = 8, position = [0, 70, 0]) {
+    addCharacter(option = {radius: 4, height: 8, position: [0, 70, 0], mass: 1, maxJumpHeight: 50, walkSpeed: 2.5}) {
 
-        return _CharacterControl.add(radius, height, position);
+        option.height = option.height || 10;
+        option.radius = option.radius || 4;
+        option.position = option.position || [0, option.height, 0];
+        option.mass = option.mass || 1;
+        option.maxJumpHeight = option.maxJumpHeight || 50;
+        option.walkSpeed = option.walkSpeed || 2.5;
+
+        return _CharacterControl.add(option);
     }
 
     AddMeshVolumeBody(mesh, option = {}) {
