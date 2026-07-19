@@ -91,7 +91,9 @@ export function mathExtend() {
         this.set_z(zz);
         return this;
     }
-
+    /*
+    PxExtendedVec3
+    */
     PhysX.PxExtendedVec3.prototype.toArray = function(array, offset) {
 
         let direct = array !== undefined;
@@ -104,6 +106,17 @@ export function mathExtend() {
 		array[offset + 2] = this.get_z();
 
         if(!direct) return array;
+    }
+
+    PhysX.PxExtendedVec3.prototype.fromArray = function(array, offset) {
+
+        offset = offset || 0;
+
+		this.set_x(array[offset]);
+        this.set_y(array[offset + 1]);
+        this.set_z(array[offset + 2]);
+
+		return this;
     }
     /*
     Quat
