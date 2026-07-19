@@ -5,12 +5,13 @@
 
 import {loadPhysX} from './Loader.js';
 import {RigidBody} from './RigidBody.js';
+import {DeformableVolumeBody} from './DeformableVolumeBody.js';
 import {Debug} from './Debug.js';
 import {CharacterControl} from './CharacterControl.js';
 import {mathExtend} from './Match.js';
 
 const isServer = false;
-let _scope, _physics, _scene, _RigidBody, _CharacterControl, _Debug;
+let _scope, _physics, _scene, _RigidBody, _CharacterControl, _Debug, _VolumeBody;
 let _isDebug = true, _isStep = false, _subSteps = 4;
 
 globalThis.PhysX = loadPhysX;
@@ -37,6 +38,12 @@ export class WEBLPhy {
         const SimulationCallback = new PhysX.PxSimulationEventCallbackImpl();
         const DefaultAllocator = new PhysX.PxDefaultAllocator();
         const DefaultErrorCallback = new PhysX.PxDefaultErrorCallback();
+
+        DefaultErrorCallback.reportError = (code, message, file, line) => {
+
+            console.log(`Code[${code}], msg[${message}], file[${file}], line[${line}]`);
+        };
+
         const Foundation = PhysX.CreateFoundation(version, DefaultAllocator, DefaultErrorCallback);
     
         const Tolerances = new PhysX.PxTolerancesScale();
@@ -74,6 +81,7 @@ export class WEBLPhy {
         }
 
         _RigidBody = new RigidBody(_physics, _scene, cookingParams);
+        _VolumeBody = new DeformableVolumeBody(_physics, _scene, cookingParams);
         _CharacterControl = new CharacterControl(_physics, _scene);
 
         if (_isDebug && _scope.THREEScene) {
@@ -153,6 +161,11 @@ export class WEBLPhy {
     addCharacter(radius = 4, height = 8, position = [0, 70, 0]) {
 
         return _CharacterControl.add(radius, height, position);
+    }
+
+    AddMeshVolumeBody(mesh, option = {}) {
+
+        _VolumeBody.Add(mesh, option);
     }
 
     getCharacterControl() {
