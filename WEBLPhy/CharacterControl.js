@@ -33,15 +33,15 @@ export class CharacterControl {
         ccd.height = height;
         ccd.radius = radius;
         ccd.stepOffset = 0.1 // Смещение шага
-        ccd.contactOffset = 1.001; // доп.слой вокруг капсулы
-        ccd.maxJumpHeight = 1.001; // размер ограничивающего объема вниз
-        ccd.invisibleWallHeight = 0; // ?
+        ccd.contactOffset = 4.001; // доп.слой вокруг капсулы
+        ccd.maxJumpHeight = 4.001; // размер ограничивающего объема вниз
+        ccd.invisibleWallHeight = 4; // ?
         ccd.slopeLimit = Math.cos((45 * Math.PI) / 180); // предел наклона, при котором движение продалжается
         ccd.climbingModeEnum = PhysX.PxCapsuleClimbingModeEnum.eEASY;
         ccd.material = this.physics.createMaterial(0.1, 0.1, 0.1);
         ccd.reportCallback = r_callback;
         ccd.behaviorCallback = b_callback;
-        ccd.nonWalkableMode = PhysX.PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING; // PhysX.PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING;
+        ccd.nonWalkableMode = PhysX.PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING_AND_FORCE_SLIDING; // PhysX.PxControllerNonWalkableModeEnum.ePREVENT_CLIMBING;
 
         const pos = new PhysX.PxExtendedVec3(position[0], position[1], position[2]);
         const controller = _manager.createController(ccd);
@@ -67,6 +67,7 @@ export class CharacterControl {
             const ShapeHit = {
                 worldNormal: point.worldNormal.toArray(),
                 worldPos: point.worldPos.toArray(),
+                shape: point.shape
             };
             _characters[_PtrByIdChar.get(point.controller.ptr).id].ShapeHit =  ShapeHit;
         };
@@ -93,6 +94,22 @@ export class CharacterControl {
 
         PhysX.destroy(pos);
         return  _characters.length - 1;
+    }
+
+    addObstacleBox(option = {position: [0, 0, 0], quat: [0, 0, 0, 1], w: 1, h: 1, d: 1}) {
+
+        option.position = option.position || [0, 0, 0];
+        option.quat = option.quat || [0, 0, 0, 1];
+        option.w = option.w || 1;
+        option.h = option.h || 1;
+        option.d = option.d || 1;
+
+        const Obstacle = new PhysX.PxBoxObstacle();
+        Obstacle.mHalfExtents.fromArray([option.w, option.h, option.d]);
+        Obstacle.mPos.fromArray(option.position);
+        Obstacle.mRot.fromArray(option.quat);
+
+        const handle = _ObstacleContext.addObstacle(Obstacle);
     }
 
     getPosition(id, type = 'default', offsetY = 0) {
