@@ -280,15 +280,23 @@ export class RigidBody {
                 const sample = new PhysX.PxHeightFieldSample();
                 const heightFieldDesc = new PhysX.PxHeightFieldDesc();
 
-                /*for (let i = 0; i < rows; i++) {
 
-                    for (let j = 0; j < cols; j++) {
+                /*for (let i = 0 ; i < data.length; i++) {
 
-                        sample.height = data[i*j];
+                    sample.height = data[i];
+                    sample.setTessFlag();
+                    sampleArray.pushBack(sample);
+                }*/
 
-                        if (i % 2 != j % 2) {
+                for (let row = 0; row < rows; row++) {
 
-                            sample.clearTessFlag()
+                    for (let col = (cols - 1); col >= 0; col--) {
+
+                        sample.height = data[col * cols + row];
+
+                        if (row % 2 != col % 2) {
+
+                        sample.clearTessFlag();
                         } else {
 
                             sample.setTessFlag();
@@ -296,14 +304,8 @@ export class RigidBody {
 
                         sampleArray.pushBack(sample);
                     }
-                }*/
-
-                for (let i = 0 ; i < data.length; i++) {
-
-                    sample.height = data[i];
-                    sample.setTessFlag();
-                    sampleArray.pushBack(sample);
                 }
+
                 heightFieldDesc.nbColumns = cols;
                 heightFieldDesc.nbRows = rows;
                 heightFieldDesc.format = PhysX.PxHeightFieldFormatEnum.eS16_TM;
@@ -311,7 +313,7 @@ export class RigidBody {
                 heightFieldDesc.samples.data = sampleArray.begin();
                 const pxHeightField = new PhysX.CreateHeightField(heightFieldDesc);
 
-                geometry = new PhysX.PxHeightFieldGeometry(pxHeightField, flags, 1, 1, 1);
+                geometry = new PhysX.PxHeightFieldGeometry(pxHeightField, flags, 1, 1, -1);  // invert to three.js
 
                 if (geometry.releaseWithGeometry) {
 
@@ -322,7 +324,8 @@ export class RigidBody {
                 shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
 
                 Quat_relative.fromArray([0, 0, 0, 1]);
-                Vec3_z.fromArray([-cols * 0.5, 0, -rows * 0.5]);
+                //Vec3_z.fromArray([cols * 0.5, 0, rows * 0.5]);
+                Vec3_z.fromArray([cols * -0.5, 0, rows * 0.5]); // invert to three.js
                 RelativePose.set_q(Quat_relative);
                 RelativePose.set_p(Vec3_z);
 
