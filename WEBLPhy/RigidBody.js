@@ -273,30 +273,23 @@ export class RigidBody {
             case 'HeightField': {
 
                 const data = option.HeightField.data;
-                const rows = option.HeightField.rows;
-                const cols = option.HeightField.cols;
+                const rows = option.HeightField.rows || 1;
+                const colums = option.HeightField.colums || 1;
 
                 const sampleArray = new PhysX.PxArray_PxHeightFieldSample();
                 const sample = new PhysX.PxHeightFieldSample();
                 const heightFieldDesc = new PhysX.PxHeightFieldDesc();
-
-
-                /*for (let i = 0 ; i < data.length; i++) {
-
-                    sample.height = data[i];
-                    sample.setTessFlag();
-                    sampleArray.pushBack(sample);
-                }*/
+                const scale = option.HeightField.scale || [1, 1, 1];
 
                 for (let row = 0; row < rows; row++) {
 
-                    for (let col = (cols - 1); col >= 0; col--) {
+                    for (let col = (colums - 1); col >= 0; col--) {
 
-                        sample.height = data[col * cols + row];
+                        sample.height = data[col * colums + row];
 
                         if (row % 2 != col % 2) {
 
-                        sample.clearTessFlag();
+                            sample.clearTessFlag();
                         } else {
 
                             sample.setTessFlag();
@@ -306,14 +299,18 @@ export class RigidBody {
                     }
                 }
 
-                heightFieldDesc.nbColumns = cols;
+                heightFieldDesc.nbColumns = colums;
                 heightFieldDesc.nbRows = rows;
                 heightFieldDesc.format = PhysX.PxHeightFieldFormatEnum.eS16_TM;
                 heightFieldDesc.samples.stride = 4;
                 heightFieldDesc.samples.data = sampleArray.begin();
                 const pxHeightField = new PhysX.CreateHeightField(heightFieldDesc);
 
-                geometry = new PhysX.PxHeightFieldGeometry(pxHeightField, flags, 1, 1, -1);  // invert to three.js
+                const rowScale = rows / (rows - 1 ) * scale[0];
+                const columnScale = colums / (colums - 1) * scale[2] * (-1/*invert to three.js*/);
+                const heightScale = scale[1];
+
+                geometry = new PhysX.PxHeightFieldGeometry(pxHeightField, flags, heightScale, rowScale, columnScale);
 
                 if (geometry.releaseWithGeometry) {
 
@@ -324,8 +321,7 @@ export class RigidBody {
                 shape = PhysX.PxRigidActorExt.prototype.createExclusiveShape(rigid.toBody(), geometry, material, flags);
 
                 Quat_relative.fromArray([0, 0, 0, 1]);
-                //Vec3_z.fromArray([cols * 0.5, 0, rows * 0.5]);
-                Vec3_z.fromArray([cols * -0.5, 0, rows * 0.5]); // invert to three.js
+                Vec3_z.fromArray([(rows * scale[0]) * -0.5, 0, (colums * scale[2]) * 0.5]); // invert to three.js
                 RelativePose.set_q(Quat_relative);
                 RelativePose.set_p(Vec3_z);
 
